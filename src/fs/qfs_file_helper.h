@@ -1,6 +1,7 @@
 #include "file_helper.h"
 #include "file_system_helper.h"
 #include "qfs_file_system_helper.h"
+#include <fcntl.h>
 
 class QFSFileHelper : public FileHelper {
  public:

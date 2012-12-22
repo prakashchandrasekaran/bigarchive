@@ -171,9 +171,9 @@ void CDSUtility::Init()
             try
             {
 		// CHKIT
-		mDataOutputFH = new QFSFileHelper((QFSHelper *)mFileSystemHelper, mDataFileName, 3); // APPEND
+		mDataOutputFH = new QFSFileHelper((QFSHelper *)mFileSystemHelper, mDataFileName, O_APPEND); // APPEND
 		mDataOutputFH->Create();
-		mIndexOutputFH = new QFSFileHelper((QFSHelper *)mFileSystemHelper, mIndexFileName, 3);
+		mIndexOutputFH = new QFSFileHelper((QFSHelper *)mFileSystemHelper, mIndexFileName, O_APPEND);
 		mIndexOutputFH->Create();
             }
             catch(ExceptionBase& e)
@@ -655,7 +655,7 @@ bool GeneratePartitionIndex(std::string& path, uint32_t no_partitions, std::stri
         try
         {
 		// CHKIT
-	    temp = new QFSFileHelper((QFSHelper *)mFileSystemHelper, ifilevec[j], 2); // WRITE
+	    temp = new QFSFileHelper((QFSHelper *)mFileSystemHelper, ifilevec[j], O_WRONLY); // WRITE
             // AppendStore::PanguHelper::CreateLogFile(ifilevec[j], DF_MINCOPY, DF_MAXCOPY, AppName, PartName);
         } 
         catch(ExceptionBase& e)

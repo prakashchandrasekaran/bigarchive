@@ -6,7 +6,7 @@
 #include <tr1/memory>
 
 
-#define APSARA_DEFINE_EXCEPTION(ExClass, Base)          \
+#define DEFINE_EXCEPTION(ExClass, Base)          \
     ExClass(const std::string& strMsg="") throw()       \
         : Base(strMsg)                                  \
     {}                                                  \
@@ -22,6 +22,15 @@
     {                                                                   \
         return std::tr1::shared_ptr<ExceptionBase>(new ExClass(*this)); \
     }
+
+
+#define THROW_EXCEPTION(ExClass, args...)                                  \
+    do                                                                  \
+    {                                                                   \
+        ExClass tmp_3d3079a0_61ec_48e6_abd6_8a33b0eb91f0(args);         \
+        tmp_3d3079a0_61ec_48e6_abd6_8a33b0eb91f0.Init(__FILE__, __PRETTY_FUNCTION__, __LINE__); \
+        throw tmp_3d3079a0_61ec_48e6_abd6_8a33b0eb91f0;                 \
+    } while (false)
 
 
 class ExceptionBase : public std::exception
@@ -119,80 +128,80 @@ public:
 class StorageExceptionBase : public ExceptionBase
 {
 public:
-    APSARA_DEFINE_EXCEPTION(StorageExceptionBase, ExceptionBase);
+    DEFINE_EXCEPTION(StorageExceptionBase, ExceptionBase);
 };
 
 
 class FileExistException : public StorageExceptionBase
 {
 public:
-    APSARA_DEFINE_EXCEPTION(FileExistException, StorageExceptionBase);
+    DEFINE_EXCEPTION(FileExistException, StorageExceptionBase);
 };
 
 // when open/delete/rename/... an non-exist file
 class FileNotExistException : public StorageExceptionBase
 {
 public:
-    APSARA_DEFINE_EXCEPTION(FileNotExistException, StorageExceptionBase);
+    DEFINE_EXCEPTION(FileNotExistException, StorageExceptionBase);
 };
 
 class DirectoryExistException : public StorageExceptionBase
 {
 public:
-    APSARA_DEFINE_EXCEPTION(DirectoryExistException, StorageExceptionBase);
+    DEFINE_EXCEPTION(DirectoryExistException, StorageExceptionBase);
 };
 
 class DirectoryNotExistException : public StorageExceptionBase
 {
 public:
-    APSARA_DEFINE_EXCEPTION(DirectoryNotExistException, StorageExceptionBase);
+    DEFINE_EXCEPTION(DirectoryNotExistException, StorageExceptionBase);
 };
 
 class SameNameEntryExistException : public StorageExceptionBase
 {
     public:
-        APSARA_DEFINE_EXCEPTION(SameNameEntryExistException, StorageExceptionBase);
+        DEFINE_EXCEPTION(SameNameEntryExistException, StorageExceptionBase);
 };
 
 // when append/delete a file that being appended
 class FileAppendingException : public StorageExceptionBase
 {
 public:
-    APSARA_DEFINE_EXCEPTION(FileAppendingException, StorageExceptionBase);
+    DEFINE_EXCEPTION(FileAppendingException, StorageExceptionBase);
 };
 
 // when opening a file that cannot be overwritten
 class FileOverwriteException: public StorageExceptionBase
 {
 public:
-    APSARA_DEFINE_EXCEPTION(FileOverwriteException, StorageExceptionBase);
+    DEFINE_EXCEPTION(FileOverwriteException, StorageExceptionBase);
 };
 
 class PangunNotEnoughChunkserverExcepion : public StorageExceptionBase
 {
 public:
-    APSARA_DEFINE_EXCEPTION(PangunNotEnoughChunkserverExcepion, StorageExceptionBase);
+    DEFINE_EXCEPTION(PangunNotEnoughChunkserverExcepion, StorageExceptionBase);
 };
 
 // when read, data is unavailable due to internal error
 class DataUnavailableException : public StorageExceptionBase
 {
 public:
-    APSARA_DEFINE_EXCEPTION(DataUnavailableException, StorageExceptionBase);
+    DEFINE_EXCEPTION(DataUnavailableException, StorageExceptionBase);
 };
 
 // when append/commit, data stream is corrupted due to internal error
 class StreamCorruptedException : public StorageExceptionBase
 {
 public:
-    APSARA_DEFINE_EXCEPTION(StreamCorruptedException, StorageExceptionBase);
+    DEFINE_EXCEPTION(StreamCorruptedException, StorageExceptionBase);
 };
 
 // when end of stream comes unexpected
 class UnexpectedEndOfStreamException: public StorageExceptionBase
 {
 public:
-    APSARA_DEFINE_EXCEPTION(UnexpectedEndOfStreamException, StorageExceptionBase);
+    DEFINE_EXCEPTION(UnexpectedEndOfStreamException, StorageExceptionBase);
 };
 
 

@@ -490,7 +490,7 @@ void PanguScanner::InitScanner()
         std::string fileName = Chunk::GetDatFname(mRoot, mChunkId);
         std::string logFileName = Chunk::GetLogFname(mRoot, mChunkId);
 	// INIT : CHKIT, decide on the file mode
-        mScannerFH = new QFSFileHelper((QFSHelper *)mFileSystemHelper, fileName, 1); // READ mode); // PanguHelper::OpenLog4Read(fileName);
+        mScannerFH = new QFSFileHelper((QFSHelper *)mFileSystemHelper, fileName, O_RDONLY); // READ mode); // PanguHelper::OpenLog4Read(fileName);
 	mScannerFH->Open();
         ReadDeleteLog(logFileName);
     }
@@ -514,7 +514,7 @@ void PanguScanner::ReadDeleteLog(const std::string& fname)
     if (fexist) 
     {
         // CHKIT
- 	FileHelper* deleteLogFH = new QFSFileHelper((QFSHelper *)mFileSystemHelper, fname, 1); // READ);
+ 	FileHelper* deleteLogFH = new QFSFileHelper((QFSHelper *)mFileSystemHelper, fname, O_RDONLY); // READ);
 	deleteLogFH->Open();
         // LogFileInputStreamPtr deleteLogFile = PanguHelper::OpenLog4Read(fname);
         try
@@ -660,7 +660,7 @@ bool PanguScanner::Next(std::string* handle, std::string* item)
                     mChunkList.pop_front();
                     mScannerFH->Close();
 			// CHKIT
-                    mScannerFH = new QFSFileHelper((QFSHelper*)mFileSystemHelper, fileName, 1); // READ);
+                    mScannerFH = new QFSFileHelper((QFSHelper*)mFileSystemHelper, fileName, O_RDONLY); // READ);
 		    mScannerFH->Open();
                     std::string logFileName = Chunk::GetLogFname(mRoot, mChunkList.front());
                     ReadDeleteLog(logFileName);

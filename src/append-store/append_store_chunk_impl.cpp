@@ -46,7 +46,7 @@ Chunk::Chunk(const std::string& root, ChunkIDType chunk_id)
 void Chunk::LoadDeleteLog()
 {
 	// CHKIT
-	mDeleteLogFH = new QFSFileHelper((QFSHelper*) mFileSystemHelper, mLogFileName, 2);
+	mDeleteLogFH = new QFSFileHelper((QFSHelper*) mFileSystemHelper, mLogFileName, O_WRONLY);
 	if(mFileSystemHelper->IsFileExists(mLogFileName.c_str()) == false) {
 		mDeleteLogFH->Create();
 	}
@@ -76,9 +76,9 @@ void Chunk::CheckIfNew()
     if (!dexist && !iexist)
     {
 	QFSFileHelper *t;
-       	t = new QFSFileHelper((QFSHelper*)mFileSystemHelper, mDataFileName, 2); // WRITE
+       	t = new QFSFileHelper((QFSHelper*)mFileSystemHelper, mDataFileName, O_WRONLY); // WRITE
 	t->Create();
-       	t = new QFSFileHelper((QFSHelper*)mFileSystemHelper, mIndexFileName, 2); // WRITE
+       	t = new QFSFileHelper((QFSHelper*)mFileSystemHelper, mIndexFileName, O_WRONLY); // WRITE
         t->Create();
     }
 }
@@ -174,7 +174,7 @@ void Chunk::AppendIndex()
             }
 
             // CHKIT
-            mIndexOutputFH = new QFSFileHelper((QFSHelper *)mFileSystemHelper, mIndexFileName, 2); // WRITE
+            mIndexOutputFH = new QFSFileHelper((QFSHelper *)mFileSystemHelper, mIndexFileName, O_WRONLY); // WRITE
             mIndexOutputFH->Open();
 
             if (retryCount > 1)
@@ -291,7 +291,7 @@ bool Chunk::Remove(const IndexType& index)
             }
             // mDeleteLogStream = PanguHelper::OpenLog4Append(mLogFileName);
 		// CHKIT
-            mDeleteLogFH = new QFSFileHelper((QFSHelper*)mFileSystemHelper, mLogFileName, 2); // WRITE);
+            mDeleteLogFH = new QFSFileHelper((QFSHelper*)mFileSystemHelper, mLogFileName, O_WRONLY); // WRITE);
 
             if (retryCount > 1)
             {
@@ -336,14 +336,14 @@ bool Chunk::LoadData(bool flag)
         // mDataOutputStream  = PanguHelper::OpenLog4Append(mDataFileName);
         // mIndexOutputStream = PanguHelper::OpenLog4Append(mIndexFileName);
 	// CHKIT
-        mDataOutputFH = new QFSFileHelper((QFSHelper *)mFileSystemHelper, mDataFileName, 2);// WRITE);
+        mDataOutputFH = new QFSFileHelper((QFSHelper *)mFileSystemHelper, mDataFileName, O_WRONLY);// WRITE);
         mDataOutputFH->Open();
-        mIndexOutputFH = new QFSFileHelper((QFSHelper *)mFileSystemHelper, mIndexFileName, 2); //WRITE);
+        mIndexOutputFH = new QFSFileHelper((QFSHelper *)mFileSystemHelper, mIndexFileName, O_WRONLY); //WRITE);
         mIndexOutputFH->Open();
     }
     else 
     {
-    	mDataInputFH = new QFSFileHelper((QFSHelper *)mFileSystemHelper, mDataFileName, 1); // READ);
+    	mDataInputFH = new QFSFileHelper((QFSHelper *)mFileSystemHelper, mDataFileName, O_RDONLY); // READ);
     	mDataInputFH->Open();
         // mDataInputStream = PanguHelper::OpenLog4Read(mDataFileName);
     }
@@ -620,7 +620,7 @@ OffsetType Chunk::AppendRaw(const IndexType& index, const uint32_t numentry, con
             }
 
 		// CHKIT
-            mDataOutputFH = new QFSFileHelper((QFSHelper*)mFileSystemHelper, mDataFileName, 3); //APPEND
+            mDataOutputFH = new QFSFileHelper((QFSHelper*)mFileSystemHelper, mDataFileName, O_APPEND); //APPEND
 		// PanguHelper::OpenLog4Append(mDataFileName);
             mDataOutputFH->Open();
             

@@ -59,7 +59,7 @@ void IndexVector::LoadFromFile(const std::string& fname)
     QFSHelper *qfsHelper = new QFSHelper();
     qfsHelper->Connect("host", 30000);
     
-    QFSFileHelper *qfsFH = new QFSFileHelper(qfsHelper, fname, 1); // READ
+    QFSFileHelper *qfsFH = new QFSFileHelper(qfsHelper, fname, O_RDONLY); // READ
     // LogFileInputStreamPtr ifsPtr = PanguHelper::OpenLog4Read(fname);
 
     try
