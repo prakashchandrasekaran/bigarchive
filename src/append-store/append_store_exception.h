@@ -33,16 +33,78 @@
     } while (false)
 
 
+class Any;
+
 class ExceptionBase : public std::exception
 {
 public:
     ExceptionBase(const std::string& message = "") throw();
+
     virtual ~ExceptionBase() throw();
+
+    virtual std::tr1::shared_ptr<ExceptionBase> Clone() const;
+
+    void Init(const char* file, const char* function, int line);
+
+    virtual void SetCause(const ExceptionBase& cause);
+
+    virtual void SetCause(std::tr1::shared_ptr<ExceptionBase> cause);
+
+    virtual std::tr1::shared_ptr<ExceptionBase> GetCause() const;
+
+    // Return the root cause, if the exception has the root cause; else return itself 
+    virtual std::tr1::shared_ptr<ExceptionBase> GetRootCause() const;
+
+    virtual std::string GetClassName() const;
+
+    virtual std::string GetMessage() const;
+
+    /**
+     * With a) detailed throw location (file + lineno) (if availabe), b) Exception class name, and
+     * c) content of GetMessage() (if not empty)
+     */
+    /* override */ const char* what() const throw();
+
+    /**
+     * Synonym of what(), except for the return type.
+     */
+    const std::string& ToString() const;
+
+    const std::string& GetExceptionChain() const;
+
+    std::string GetStackTrace() const;
+
 protected:
+    std::tr1::shared_ptr<ExceptionBase> mNestedException;
     std::string mMessage;
+    const char* mFile;
+    const char* mFunction;
+    int mLine;
+
 private:
+    enum { MAX_STACK_TRACE_SIZE = 50 };
+    void* mStackTrace[MAX_STACK_TRACE_SIZE];
+    size_t mStackTraceSize;
+
     mutable std::string mWhat;
+
+    friend Any ToJson(const ExceptionBase& e);
+    friend void FromJson(ExceptionBase& e, const Any& a);
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 class AppendStoreExceptionBase : public  ExceptionBase
 {

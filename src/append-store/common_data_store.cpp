@@ -143,7 +143,7 @@ void CDSUtility::Init()
     else if (!direxist)
     {
         //LOG_ERROR(sLogger, ("Error: ", "Directory not exist and readonly"));
-        //APSARA_THROW(ExceptionBase, "CDS store Directory not exist and readonly");
+        THROW_EXCEPTION(ExceptionBase, "CDS store Directory not exist and readonly");
     }
 
     bool dexist;
@@ -161,7 +161,7 @@ void CDSUtility::Init()
     if (! ((dexist && iexist) || (!dexist && !iexist)) )
     {
         //LOG_ERROR(sLogger, ("Error: ", "mDataFileName and mIndexFileName not co-exist"));
-        //APSARA_THROW(ExceptionBase, "mDataFileName and mIndexFileName not co-exist");
+        THROW_EXCEPTION(ExceptionBase, "mDataFileName and mIndexFileName not co-exist");
     }
 
     if (mAppend) 
@@ -214,7 +214,7 @@ bool CDSUtility::Read(const std::string& handle, std::string* data)
         {
             std::stringstream ss;
             ss << "DataInputStream file read error, need size: " << size << " actual size: "<<read_len;
-            //APSARA_THROW(ExceptionBase, ss.str());
+            THROW_EXCEPTION(ExceptionBase, ss.str());
         }
     }
     catch (ExceptionBase& e)
@@ -232,7 +232,7 @@ std::string CDSUtility::Append(const std::string index, const std::string& data)
 {
     if (!mAppend)
     {
-        //APSARA_THROW(ExceptionBase, "Cannot append to readOnly CDS store");
+        THROW_EXCEPTION(ExceptionBase, "Cannot append to readOnly CDS store");
     }
 
     assert(index.size() == 20);
@@ -452,7 +452,7 @@ void CdsIndexReader::InitReader()
     if (!iexist)
     {
         //LOG_ERROR(sLoggerReader, ("Error: ", "IndexFileName not co-exist"));
-        //APSARA_THROW(ExceptionBase, "IndexFileName not co-exist");
+        THROW_EXCEPTION(ExceptionBase, "IndexFileName not co-exist");
     }
 
      // CHKIT whether initialized 
@@ -487,7 +487,7 @@ bool CdsIndexReader::Next(MultiIndexRecord& out_record)
             if (rsize != indexSize)
             {
                 //LOG_ERROR(sLoggerReader, ("Error", "file read error in IndexReader"));
-                //APSARA_THROW(ExceptionBase, "file read error in IndexReader");
+                THROW_EXCEPTION(ExceptionBase, "file read error in IndexReader");
             }
 
             std::stringstream ss(buffer);
@@ -503,7 +503,7 @@ bool CdsIndexReader::Next(MultiIndexRecord& out_record)
     }
     catch (ExceptionBase& e)
     {
-        //APSARA_THROW(ExceptionBase, "error in Next(): " + e.ToString());
+        THROW_EXCEPTION(ExceptionBase, "error in Next(): " + e.ToString());
     }
     return false;
 }
@@ -530,7 +530,7 @@ bool CdsIndexReader::Next(std::vector<CdsIndexRecord>& outvec)
             if (streamBuf.bad())
             {
                 //LOG_ERROR(sLoggerReader, ("Error in Next() due to stream bad", "."));
-                //APSARA_THROW(ExceptionBase, "error in Next()");
+                THROW_EXCEPTION(ExceptionBase, "error in Next()");
             }
 
             CdsIndexRecord cr;
@@ -701,7 +701,7 @@ bool GeneratePartitionIndex(std::string& path, uint32_t no_partitions, std::stri
             }
             if (streamBuf.bad()) 
             {
-                //APSARA_THROW(ExceptionBase, "streamBuf.bad() in GeneratePartitionIndex()");
+                THROW_EXCEPTION(ExceptionBase, "streamBuf.bad() in GeneratePartitionIndex()");
             }
 
             CdsIndexRecord cr;
