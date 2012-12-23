@@ -2,11 +2,21 @@
 File System helper header
 */
 
-#include<vector>
-#include<string>
-
 #ifndef FILE_SYSTEM_HELPER_H
 #define FILE_SYSTEM_HELPER_H
+
+#include<vector>
+#include<string>
+#include <log4cxx/logger.h>
+#include <log4cxx/xml/domconfigurator.h>
+
+using namespace log4cxx;
+using namespace log4cxx::xml;
+using namespace log4cxx::helpers;
+
+// static logger variable
+LoggerPtr logger(Logger::getLogger( "appendstore.qfs_helper"));
+ //
 
 using std::vector;
 using std::string;

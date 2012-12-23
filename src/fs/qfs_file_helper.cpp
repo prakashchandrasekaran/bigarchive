@@ -1,6 +1,7 @@
 #include "qfs_file_helper.h"
 
 	QFSFileHelper::QFSFileHelper(QFSHelper *qfshelper, string fname, int mode) {
+		LOG4CXX_INFO(logger, " file helper for file created : " << fname );
 		this->qfshelper = qfshelper;
 		this->filename = fname;
 		this->mode = mode;

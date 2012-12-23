@@ -1,8 +1,21 @@
 #include "qfs_file_system_helper.h"
 
+/*
+#include <log4cxx/logger.h>
+#include <log4cxx/xml/domconfigurator.h>
+
+using namespace log4cxx;
+using namespace log4cxx::xml;
+using namespace log4cxx::helpers;
+
+ // Define static logger variable
+LoggerPtr logger(Logger::getLogger( "appendstore.qfs_helper"));
+*/
+
 		void QFSHelper::Connect() 
-		{
+		{	
 			Connect(string("localhost"), 40000);
+			LOG4CXX_INFO(logger, "Connected to QFS Master Node");
 		}
 
 		void QFSHelper::Connect(string metaserverhost, int metaserverport) 
