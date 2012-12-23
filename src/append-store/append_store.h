@@ -10,7 +10,7 @@
 #include "apsara/common/safeguard.h"
 */
 #include "append_store_types.h"
-#include "append_store_exception.h"
+#include "exception.h"
 #include "append_store_chunk.h"
 #include "CompressionCodec.h"
 

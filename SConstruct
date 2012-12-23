@@ -12,20 +12,21 @@ print '**** Compiling in ' + mymode + ' mode...'
 debugcflags = [] #'-W1', '-GX', '-EHsc', '-D_DEBUG', '/MDd']   #extra compile flags for debug
 releasecflags = [] # '-O2', '-EHsc', '-DNDEBUG', '/MD']         #extra compile flags for release
 
-PROJECT_HOME = os.getcwd()
-SOURCE_HOME  = PROJECT_HOME + "/" + "src"
-BINARY_HOME  = PROJECT_HOME + "/" + "bin" 
-LIB_HOME     = PROJECT_HOME + "/" + "lib" # /home/prakash/bigarchive/bigarchive_v1/lib"
-INCLUDE_HOME = SOURCE_HOME + "/" + "include"
+PROJECT_HOME   = os.getcwd()
+SOURCE_HOME    = PROJECT_HOME + "/" + "src/"
+BINARY_HOME    = PROJECT_HOME + "/" + "bin/" 
+LIB_HOME       = PROJECT_HOME + "/" + "lib/" # /home/prakash/bigarchive/bigarchive_v1/lib"
+INCLUDE_HOME   = SOURCE_HOME + "/" + "include/"
+EXCEPTION_HOME = SOURCE_HOME + "/" + "exception/"
 
 env = Environment()
 
-print "PROJECT_HOME : " + PROJECT_HOME
-print "SOURCE_HOME  : " + SOURCE_HOME 
-print "BINARY_HOME  : " + BINARY_HOME
-print "LIB_HOME     : " + LIB_HOME
-print "INCLUDE_HOME : " + INCLUDE_HOME
-
+print "PROJECT_HOME   : " + PROJECT_HOME
+print "SOURCE_HOME    : " + SOURCE_HOME 
+print "BINARY_HOME    : " + BINARY_HOME
+print "LIB_HOME       : " + LIB_HOME
+print "INCLUDE_HOME   : " + INCLUDE_HOME
+print "EXCEPTION_HOME : " + EXCEPTION_HOME
 
 # env.Append(LIBS = ['SDL_image','GL'])
 #env.Append(LIBS = [
@@ -43,11 +44,15 @@ print "INCLUDE_HOME : " + INCLUDE_HOME
 
 # make sure the sconscripts can get to the variables
 Export('env', 'mymode', 'debugcflags', 'releasecflags', 'PROJECT_HOME', 'SOURCE_HOME', 'BINARY_HOME',
-	'LIB_HOME', 'INCLUDE_HOME')
+	'LIB_HOME', 'INCLUDE_HOME', 'EXCEPTION_HOME')
 
 env.SConsignFile()
 
 #specify the sconscript for file_system
+
+project = 'exception'
+SConscript(SOURCE_HOME + "/" + project + '/SConscript', exports=['project'])
+
 project = 'fs'
 SConscript(SOURCE_HOME + "/" + project + '/SConscript', exports=['project'])
 

@@ -1,5 +1,5 @@
 #include "append_store_index.h"
-#include "append_store_exception.h"
+#include "exception.h"
 #include "qfs_file_helper.h"
 
 //using namespace apsara;

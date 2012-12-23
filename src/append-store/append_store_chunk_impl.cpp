@@ -1,5 +1,5 @@
 #include "append_store_chunk.h"
-#include "append_store_exception.h"
+#include "exception.h"
 
 const char* Defaults::IDX_DIR = "index/";
 const char* Defaults::DAT_DIR = "data/";

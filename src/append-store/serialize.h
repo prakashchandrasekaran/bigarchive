@@ -9,8 +9,7 @@
 #include <map>
 #include <vector>
 #include <string>
-#include "append_store_exception.h"
-
+#include "exception.h"
 #include <stdint.h>
 
 namespace marshall

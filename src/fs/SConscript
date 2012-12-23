@@ -1,6 +1,7 @@
 import glob
 
-Import('env', 'project', 'mymode', 'debugcflags', 'releasecflags', 'PROJECT_HOME', 'SOURCE_HOME', 'BINARY_HOME', 'LIB_HOME', 'INCLUDE_HOME')
+Import('env', 'project', 'mymode', 'debugcflags', 'releasecflags', 'PROJECT_HOME', 'SOURCE_HOME', 'BINARY_HOME', 'LIB_HOME', 'INCLUDE_HOME'
+	, 'EXCEPTION_HOME')
 
 localenv = env.Clone()
 
@@ -14,7 +15,7 @@ print "-------------------------------------------------------------------------
 
 print "Building project ........ " + project
 
-localenv.Append(CPPPATH = INCLUDE_HOME)
+localenv.Append(CPPPATH = [INCLUDE_HOME, EXCEPTION_HOME])
 
 if mymode == 'debug':
    localenv.Append(CCFLAGS=debugcflags)
