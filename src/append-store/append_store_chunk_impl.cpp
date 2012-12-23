@@ -70,7 +70,7 @@ void Chunk::CheckIfNew()
     if (! ((dexist && iexist) || (!dexist && !iexist)) )
     {
         // LOG_ERROR(sLogger, ("Error: ", "mDataFileName and mIndexFileName not co-exist"));
-        // APSARA_THROW(ExceptionBase, "mDataFileName and mIndexFileName not co-exist");
+        THROW_EXCEPTION(ExceptionBase, "mDataFileName and mIndexFileName not co-exist");
     }
 
     if (!dexist && !iexist)
@@ -106,7 +106,7 @@ IndexType Chunk::Append(const std::string& data)
     {
         std::stringstream ss;
         ss<< "Chunk is full but still used somehow ";
-        // APSARA_THROW(AppendStoreWriteException, ss.str());
+        THROW_EXCEPTION(AppendStoreWriteException, ss.str());
     }
     if (mBlockStream.str().size()+data.size() >= DF_MAX_BLOCK_SZ)
     {
@@ -219,7 +219,7 @@ bool Chunk::ExtractDataFromBlock(const std::string& buf, IndexType index, std::s
     {
 	// CHKIT
         // LOG_ERROR(sLogger, ("Error", "the cache has been destructed."));
-        // APSARA_THROW(AppendStoreReadException, "Failed to get cachePtr");
+        THROW_EXCEPTION(AppendStoreReadException, "Failed to get cachePtr");
     }
 
     bool ret = false;
@@ -240,7 +240,7 @@ bool Chunk::ExtractDataFromBlock(const std::string& buf, IndexType index, std::s
         r.Deserialize(streamBuf);
         if (!IsValid(r.mIndex))
         {
-            // APSARA_THROW(AppendStoreReadException, "Failed extracting data from block");
+            THROW_EXCEPTION(AppendStoreReadException, "Failed extracting data from block");
         }
 
         if (r.mIndex == index)
@@ -414,7 +414,7 @@ inline IndexType Chunk::GenerateIndex()
         return mMaxIndex;
     }
     // CHKIT
-    // APSARA_THROW(AppendStoreInvalidIndexException, "index overflow during GenerateIndex()");
+    THROW_EXCEPTION(AppendStoreInvalidIndexException, "index overflow during GenerateIndex()");
 
 }
 
@@ -525,7 +525,7 @@ bool Chunk::ReadRaw(const OffsetType& offset, std::string& data)
             std::stringstream ss;
             ss<<"DataInputStream file read error, need size: " << size <<" actual size: "<<read_len;
 		// CHKIT
-            // APSARA_THROW(AppendStoreReadException, ss.str());
+            THROW_EXCEPTION(AppendStoreReadException, ss.str());
         }
 
         CompressedDataRecord crd;
@@ -537,7 +537,7 @@ bool Chunk::ReadRaw(const OffsetType& offset, std::string& data)
         if (sharedptr == NULL)
         {
             // LOG_ERROR(sLogger, ("Error", "the compression codec has been destructed."));
-            // APSARA_THROW(AppendStoreCompressionException, "decompression error inside ReadRaw()");
+            THROW_EXCEPTION(AppendStoreCompressionException, "decompression error inside ReadRaw()");
         }
 
         uint32_t uncompressedSize;
@@ -546,12 +546,12 @@ bool Chunk::ReadRaw(const OffsetType& offset, std::string& data)
         if (uncompressedSize != crd.mOrigLength)
         {
             // LOG_ERROR(sLogger, ("Error", "error when decompressing due to invalid length"));
-            // APSARA_THROW(AppendStoreCompressionException, "decompression invalid length");
+            THROW_EXCEPTION(AppendStoreCompressionException, "decompression invalid length");
         }
         if (retc < 0)
         {
             // LOG_ERROR(sLogger, ("Error", "decompression codec error when decompressing inside ReadRaw()"));
-            // APSARA_THROW(AppendStoreCompressionException, "decompression codec error");
+            THROW_EXCEPTION(AppendStoreCompressionException, "decompression codec error");
         }
     }
     catch (ExceptionBase& e)
@@ -570,7 +570,7 @@ OffsetType Chunk::AppendRaw(const IndexType& index, const uint32_t numentry, con
     if (sharedptr == NULL) 
     {
         // LOG_ERROR(sLogger, ("Error", "the compression codec has been destructed."));
-        // APSARA_THROW(AppendStoreCompressionException, "compression error inside AppendRaw()");
+        THROW_EXCEPTION(AppendStoreCompressionException, "compression error inside AppendRaw()");
     }
 
     uint32_t bufsize = sharedptr->getBufferSize(data.size());
@@ -581,7 +581,7 @@ OffsetType Chunk::AppendRaw(const IndexType& index, const uint32_t numentry, con
     if (retc < 0) 
     {
         // LOG_ERROR(sLogger, ("Error", "error when compressing data"));
-        // APSARA_THROW(AppendStoreCompressionException, "compression error inside AppendRaw()");
+        THROW_EXCEPTION(AppendStoreCompressionException, "compression error inside AppendRaw()");
     }
 
     CompressedDataRecord crd(index, numentry, data.size(), compressedSize, sbuf);

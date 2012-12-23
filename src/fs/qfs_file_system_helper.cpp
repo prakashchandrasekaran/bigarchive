@@ -22,8 +22,7 @@ LoggerPtr logger(Logger::getLogger( "appendstore.qfs_helper"));
 		{
 			kfsClient = KFS::Connect(metaserverhost, metaserverport);
 			if (! kfsClient ) {
-				// logging_info("Connected to host and port ");
-				// throw exception
+				LOG4CXX_ERROR(logger, "Failed to Connect to QFS Master Node");
 			}
 		}
 
@@ -51,6 +50,9 @@ LoggerPtr logger(Logger::getLogger( "appendstore.qfs_helper"));
 
 		int QFSHelper::CreateDirectory(const char *pathname) {
 			int ret = kfsClient->Mkdir(pathname); // mode is 0777 by default
+			if(ret != 0) {
+				LOG4CXX_ERROR(logger, "Directory Creation failed : " << pathname);
+			}	
 			return ret;
   		}
 

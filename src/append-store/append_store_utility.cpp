@@ -3,17 +3,13 @@
 #include "append_store.h"
 
 
-// using namespace pangu;
-// using namespace AppendStore;
-
-
 Store* StoreFactory::Create(const StoreParameter& para, const std::string& type)
 {
     if (!type.compare(panguStore))
     {
         if (para.mAppend != true)
         {
-            //APSARA_THROW(AppendStoreFactoryException, "Has to be appendable for StoreFactory::Create");
+            THROW_EXCEPTION(AppendStoreFactoryException, "Has to be appendable for StoreFactory::Create");
         }
         return new PanguAppendStore(para, true);
     }
@@ -26,7 +22,7 @@ Store* StoreFactory::Load(const StoreParameter& para, const std::string& type)
     {
         if (para.mAppend != false)
         {
-            //APSARA_THROW(AppendStoreFactoryException, "Has to be non-appendable for StoreFactory::Load");
+            THROW_EXCEPTION(AppendStoreFactoryException, "Has to be non-appendable for StoreFactory::Load");
         }
         return new PanguAppendStore(para, false);
     }
@@ -72,7 +68,7 @@ uint64_t StoreUtility::GetDirectorySize(const std::string& dirName)
     }
     catch (ExceptionBase& e)
     {
-        //APSARA_THROW(AppendStoreReadException, "GetDirectorySize " + e.ToString());
+        THROW_EXCEPTION(AppendStoreReadException, "GetDirectorySize " + e.ToString());
     }
 
     try
@@ -92,7 +88,7 @@ uint64_t StoreUtility::GetDirectorySize(const std::string& dirName)
     }
     catch (ExceptionBase& e)
     {
-        //APSARA_THROW(AppendStoreReadException, "GetDirectorySize " + e.ToString());
+        THROW_EXCEPTION(AppendStoreReadException, "GetDirectorySize " + e.ToString());
     }
 }
 */
