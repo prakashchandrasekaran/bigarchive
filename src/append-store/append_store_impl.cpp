@@ -50,17 +50,17 @@ std::string PanguAppendStore::Append(const std::string& data)
 {
     if (!mAppend)
     {
-        //_THROW(AppendStoreWriteException, "Cannot append for read-only store");
+        THROW_EXCEPTION(AppendStoreWriteException, "Cannot append for read-only store");
     }
 
     Chunk* p_chunk = LoadAppendChunk();
     Handle h;
     h.mIndex = p_chunk->Append(data);
-    //_DEBUG(sLogger, ("Write", mRoot) ("mChunkId", p_chunk->GetID()) ("mIndex", h.mIndex) ("size", data.size()));
+    LOG4CXX_DEBUG(logger, "Write " << mRoot << "mChunkId" << p_chunk->GetID() << "mIndex" << h.mIndex << "size" << data.size());
 
     if (h.mIndex==0)
     {
-        //_THROW(AppendStoreWriteException, "Wrong handle index ==0");
+        THROW_EXCEPTION(AppendStoreWriteException, "Wrong handle index ==0");
     }
     h.mChunkId = p_chunk->GetID();
     return h.ToString();
@@ -174,7 +174,7 @@ void PanguAppendStore::Init(bool iscreate)
     {
         if (!mMeta.check(binmajor, binminor))
         {
-            //_THROW(AppendStoreMisMatchedVerException, "meta version is not matched");
+            THROW_EXCEPTION(AppendStoreMisMatchedVerException, "meta version is not matched");
         }
         mCompressionType = mMeta.compressionFlag;
     }
@@ -186,7 +186,7 @@ void PanguAppendStore::Init(bool iscreate)
         } 
         else 
 	{
-            //_THROW(AppendStoreNotExistException, "store not exist (.meta_)" + mRoot);
+            THROW_EXCEPTION(AppendStoreNotExistException, "store not exist (.meta_)" + mRoot);
         }
     }
 
@@ -197,13 +197,13 @@ void PanguAppendStore::Init(bool iscreate)
     }
     else if (mCompressionType != (uint32_t)COMPRESSOR_LZO) 
     {
-        //_THROW(AppendStoreCodecException, "unknown compression type");
+        THROW_EXCEPTION(AppendStoreCodecException, "unknown compression type");
     }
 
     // directory exist 
     if (!CheckDirs(mRoot))
     {
-        //_THROW(AppendStoreNotExistException, "store not exist (3 dirs)" + mRoot);
+        THROW_EXCEPTION(AppendStoreNotExistException, "store not exist (3 dirs)" + mRoot);
     }
     mMaxChunkId = Chunk::GetMaxChunkID(mRoot);
 
@@ -233,7 +233,7 @@ bool PanguAppendStore::ReadMetaInfo()
     try  
     {
 	// CHKIT
-        fexist = mFileSystemHelper->IsFileExists(metaFileName.c_str());
+        fexist = mFileSystemHelper->IsFileExists(metaFileName);
     }
     catch (ExceptionBase & e)
     {
@@ -263,7 +263,7 @@ bool PanguAppendStore::ReadMetaInfo()
         }
         catch (ExceptionBase& e)
         {
-            //_THROW(AppendStoreWriteException, "Cannot open meta file for append " + e.ToString());
+            THROW_EXCEPTION(AppendStoreWriteException, "Cannot open meta file for append " + e.ToString());
         }
     }
     return false;
@@ -296,7 +296,7 @@ void PanguAppendStore::WriteMetaInfo(const std::string& root, const StoreMetaDat
     }
     catch (ExceptionBase& e) 
     {
-        //_THROW(AppendStoreWriteException, e.ToString()+" Cannot generate .meta_ file");
+        THROW_EXCEPTION(AppendStoreWriteException, e.ToString()+" Cannot generate .meta_ file");
     }
 }
 
@@ -333,7 +333,7 @@ Chunk* PanguAppendStore::LoadAppendChunk()
 
     if (0 == mCurrentAppendChunk.get())
     {
-        //_THROW(AppendStoreWriteException, "Cannot get valid chunk for append");
+        THROW_EXCEPTION(AppendStoreWriteException, "Cannot get valid chunk for append");
     }
     return mCurrentAppendChunk.get();
 }
@@ -347,7 +347,7 @@ Chunk* PanguAppendStore::LoadRandomChunk(ChunkIDType id)
 /*
     if(mCurrentAppendChunk.get() != 0 && mCurrentAppendChunk->GetID() == id)
     {
-        //_THROW(AppendStoreReadException, "Trying to read a chunk that is being modified, abort...");
+        THROW_EXCEPTION(AppendStoreReadException, "Trying to read a chunk that is being modified, abort...");
     }
 */
     ChunkMapType::const_iterator it = mChunkMap.find(id);
@@ -393,7 +393,7 @@ bool PanguAppendStore::CreateDirectory(const std::string& name)
     try
     {
 	// CHKIT
-        mFileSystemHelper->CreateDirectory(name.c_str()); // , CapabilityGenerator::Generate(std::string("pangu://"),PERMISSION_ALL));
+        mFileSystemHelper->CreateDirectory(name); // , CapabilityGenerator::Generate(std::string("pangu://"),PERMISSION_ALL));
     }
     catch (DirectoryExistException& e)
     {
@@ -413,9 +413,9 @@ bool PanguAppendStore::CheckDirs(const std::string& root)
     std::string data_path = root+ std::string(Defaults::DAT_DIR);
     std::string log_path = root + std::string(Defaults::LOG_DIR);
 
-    if (mFileSystemHelper->IsDirectoryExists(index_path.c_str()) 
-        && mFileSystemHelper->IsDirectoryExists(data_path.c_str())
-        && mFileSystemHelper->IsDirectoryExists(log_path.c_str()) )
+    if (mFileSystemHelper->IsDirectoryExists(index_path) 
+        && mFileSystemHelper->IsDirectoryExists(data_path)
+        && mFileSystemHelper->IsDirectoryExists(log_path) )
     {
         return true;
     }
@@ -503,7 +503,7 @@ void PanguScanner::ReadDeleteLog(const std::string& fname)
 
     try 
     {
-        fexist = mFileSystemHelper->IsFileExists(fname.c_str());
+        fexist = mFileSystemHelper->IsFileExists(fname);
     }
     catch (ExceptionBase & e)
     {
@@ -574,11 +574,11 @@ void PanguScanner::GetAllChunkID(const std::string& root)
     try
     { 
 	// FileSystem::GetInstance()->ListDirectory(data_root, "", DF_MAXFILENO, data_files);
-        mFileSystemHelper->ListDir(data_root.c_str(), data_files);
+        mFileSystemHelper->ListDir(data_root, data_files);
     }
     catch (ExceptionBase& e)
     {
-        //_THROW(AppendStoreReadException, e.ToString()+"Cannot open list directory");
+        THROW_EXCEPTION(AppendStoreReadException, e.ToString()+"Cannot open list directory");
     }
 
     std::vector<std::string>::const_reverse_iterator it = data_files.rbegin();
@@ -625,7 +625,7 @@ bool PanguScanner::Next(std::string* handle, std::string* item)
                     if (rsize != bufSize)
                     {
                         //(PanguAppendStore::sLogger, ("Error", "file read error in Scanner"));
-                        //_THROW(AppendStoreReadException, "file read error in Scanner");
+                        THROW_EXCEPTION(AppendStoreReadException, "file read error in Scanner");
                     }
 
                     std::stringstream ss(buf);
@@ -638,12 +638,12 @@ bool PanguScanner::Next(std::string* handle, std::string* item)
                     if (uncompressedSize != crd.mOrigLength)
                     {
                         //(PanguAppendStore::sLogger, ("Error", "error when decompressing due to invalid length"));
-                        //_THROW(AppendStoreCompressionException, "decompression invalid length");
+                        THROW_EXCEPTION(AppendStoreCompressionException, "decompression invalid length");
                     }
                     if (retc < 0)
                     {
                         //(PanguAppendStore::sLogger, ("Error", "decompression codec error when decompressing inside Next()"));
-                        //_THROW(AppendStoreCompressionException, "decompression codec error");
+                        THROW_EXCEPTION(AppendStoreCompressionException, "decompression codec error");
                     }
 
                     mDataStream.str(buf);

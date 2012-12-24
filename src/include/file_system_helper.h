@@ -27,15 +27,15 @@ class FileSystemHelper {
   void Connect() {}
   void Connect(string host, int port) {}
   /* list file contents */
-  int ListDir(const char *pathname, vector<string> &result) {}
+  int ListDir(string pathname, vector<string> &result) {}
   /* checks whether file "fname" exists or not */
-  bool IsFileExists(const char *fname) {}
+  bool IsFileExists(string fname) {}
   /* checks whether directory "dirname" exits or not */
-  bool IsDirectoryExists(const char *dirname) {}
+  bool IsDirectoryExists(string dirname) {}
   /* gets file Size */
-  int getSize(const char *fname) {}
+  int getSize(string fname) {}
   /* create Directory */
-  int CreateDirectory(const char *dirname) {}
+  int CreateDirectory(string dirname) {}
 };
 
 #endif /* FILE_SYSTEM_HELPER_H */

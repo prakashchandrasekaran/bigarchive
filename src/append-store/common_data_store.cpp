@@ -117,7 +117,7 @@ void CDSUtility::Init()
     bool direxist;
     try
     {
-        direxist = mFileSystemHelper->IsDirectoryExists(mPath.c_str());
+        direxist = mFileSystemHelper->IsDirectoryExists(mPath);
     }
     catch(ExceptionBase& e)
     {
@@ -131,7 +131,7 @@ void CDSUtility::Init()
         {
             try
             {
-                mFileSystemHelper->CreateDirectory(mPath.c_str());
+                mFileSystemHelper->CreateDirectory(mPath);
             }
             catch(ExceptionBase& e)
             {
@@ -150,8 +150,8 @@ void CDSUtility::Init()
     bool iexist;
     try
     {
-        dexist = mFileSystemHelper->IsFileExists(mDataFileName.c_str()); 
-        iexist = mFileSystemHelper->IsFileExists(mIndexFileName.c_str()); 
+        dexist = mFileSystemHelper->IsFileExists(mDataFileName); 
+        iexist = mFileSystemHelper->IsFileExists(mIndexFileName); 
     }
     catch(ExceptionBase& e)
     {
@@ -442,7 +442,7 @@ void CdsIndexReader::InitReader()
     bool iexist;
     try
     {
-        iexist = mFileSystemHelper->IsFileExists(IndexFileName.c_str()); 
+        iexist = mFileSystemHelper->IsFileExists(IndexFileName); 
     }
     catch(ExceptionBase& e)
     {
@@ -606,7 +606,7 @@ bool GeneratePartitionIndex(std::string& path, uint32_t no_partitions, std::stri
         bool iexist; 
         try
         {
-            iexist = mFileSystemHelper->IsFileExists(ifilevec[j].c_str()); 
+            iexist = mFileSystemHelper->IsFileExists(ifilevec[j]); 
         }
         catch(ExceptionBase& e)
         {
@@ -623,7 +623,7 @@ bool GeneratePartitionIndex(std::string& path, uint32_t no_partitions, std::stri
     bool direxist;
     try
     {
-        direxist = mFileSystemHelper->IsDirectoryExists(dest_path.c_str());
+        direxist = mFileSystemHelper->IsDirectoryExists(dest_path);
     }
     catch(ExceptionBase& e)
     {
@@ -635,7 +635,7 @@ bool GeneratePartitionIndex(std::string& path, uint32_t no_partitions, std::stri
         try
         {
 		// CHKIT
-            mFileSystemHelper->CreateDirectory(dest_path.c_str()); //, CapabilityGenerator::Generate(std::string("pangu://"), PERMISSION_ALL));
+            mFileSystemHelper->CreateDirectory(dest_path); //, CapabilityGenerator::Generate(std::string("pangu://"), PERMISSION_ALL));
         }
         catch(ExceptionBase& e)
         {

@@ -1,5 +1,6 @@
 #include "file_system_helper.h"
 #include "KfsClient.h"
+#include "exception.h"
 
 /*
 #include <log4cxx/logger.h>
@@ -20,11 +21,11 @@ class QFSHelper : public FileSystemHelper {
 	public:
 		void Connect(); 
 		void Connect(string metaserverhost, int metaserverport);
-		bool IsFileExists(const char *fname);
-		bool IsDirectoryExists(const char *dirname);
-		int getSize(const char *fname);
-		int ListDir(const char *pathname, vector<string> &result);
-		int CreateDirectory(const char *pathname);
+		bool IsFileExists(string fname);
+		bool IsDirectoryExists(string dirname);
+		int getSize(string fname);
+		int ListDir(string pathname, vector<string> &result);
+		int CreateDirectory(string pathname);
 
 	public:	
 	KFS::KfsClient *kfsClient;

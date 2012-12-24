@@ -24,7 +24,6 @@ Chunk::Chunk(const std::string& root, ChunkIDType chunk_id,
 {
     // CHKIT : get the host and port from config file
     mFileSystemHelper = new QFSHelper();    
-    // 
     mFileSystemHelper->Connect("localhost", 30000);
     CheckIfNew();
     LoadIndex();
@@ -47,7 +46,7 @@ void Chunk::LoadDeleteLog()
 {
 	// CHKIT
 	mDeleteLogFH = new QFSFileHelper((QFSHelper*) mFileSystemHelper, mLogFileName, O_WRONLY);
-	if(mFileSystemHelper->IsFileExists(mLogFileName.c_str()) == false) {
+	if(mFileSystemHelper->IsFileExists(mLogFileName) == false) {
 		mDeleteLogFH->Create();
 	}
 	mDeleteLogFH->Open();
@@ -59,17 +58,17 @@ void Chunk::CheckIfNew()
     bool iexist;
     try
     {
-        dexist = mFileSystemHelper->IsFileExists(mDataFileName.c_str()); // PanguHelper::IsFileExist(mDataFileName);
-        iexist = mFileSystemHelper->IsFileExists(mIndexFileName.c_str()); // PanguHelper::IsFileExist(mIndexFileName);
+        dexist = mFileSystemHelper->IsFileExists(mDataFileName); // PanguHelper::IsFileExist(mDataFileName);
+        iexist = mFileSystemHelper->IsFileExists(mIndexFileName); // PanguHelper::IsFileExist(mIndexFileName);
     }
     catch(ExceptionBase& e)
     {
-        // LOG_ERROR(sLogger, ("Error in CheckIfNew: ", e.ToString()));
+        LOG4CXX_ERROR(logger, "Error in CheckIfNew: " << e.ToString());
         throw;
     }
     if (! ((dexist && iexist) || (!dexist && !iexist)) )
     {
-        // LOG_ERROR(sLogger, ("Error: ", "mDataFileName and mIndexFileName not co-exist"));
+        LOG4CXX_ERROR(logger, "mDataFileName and mIndexFileName not co-exist");
         THROW_EXCEPTION(ExceptionBase, "mDataFileName and mIndexFileName not co-exist");
     }
 
@@ -156,14 +155,14 @@ void Chunk::AppendIndex()
         }
         catch(StreamCorruptedException& e)
         {
-            // LOG_ERROR(sLogger, ("IndexOutputStream corrupt", e.ToString()));
+            LOG4CXX_ERROR(logger, "IndexOutputStream corrupt << e.ToString()");
             try
             {
                 mIndexOutputFH->Close();
             }
             catch(ExceptionBase& e)
             {
-                // LOG_ERROR(sLogger, ("Failed close file after write fail", e.ToString()));
+                LOG4CXX_ERROR(logger, "Failed close file after write fail " << e.ToString());
             }
             
             mIndexOutputFH->Seek(0);
@@ -179,13 +178,13 @@ void Chunk::AppendIndex()
 
             if (retryCount > 1)
             {
-                // LOG_ERROR(sLogger, ("DataOutputStream FlushLog fail after retry", e.ToString()));
+                LOG4CXX_ERROR(logger, "DataOutputStream FlushLog fail after retry " << e.ToString());
                 throw;
             }
         }
         catch (ExceptionBase& e)
         {
-            // LOG_ERROR(sLogger, ("IndexOutputStream FlushLog fail", e.ToString()));
+            LOG4CXX_ERROR(logger, "IndexOutputStream FlushLog fail" << e.ToString());
             throw;
         }
     } while (retryCount <= 1);
@@ -206,9 +205,7 @@ bool Chunk::Read(IndexType index, std::string* data)
     OffsetType startOffset = it->mOffset ;
     std::string buf;
     bool ret = ReadRaw(startOffset, buf);
-
     ret = ret && ExtractDataFromBlock(buf, index, data);
-
     return ret;
 }
 
@@ -218,7 +215,7 @@ bool Chunk::ExtractDataFromBlock(const std::string& buf, IndexType index, std::s
     if (cachesharedptr == NULL)
     {
 	// CHKIT
-        // LOG_ERROR(sLogger, ("Error", "the cache has been destructed."));
+        LOG4CXX_ERROR(logger, "the cache has been destructed.");
         THROW_EXCEPTION(AppendStoreReadException, "Failed to get cachePtr");
     }
 
@@ -267,41 +264,40 @@ bool Chunk::Remove(const IndexType& index)
         try
         {
         	mDeleteLogFH->Write(&tmp[0], tmp.size());
-            // mDeleteLogStream->FlushLog(&tmp[0], tmp.size());
+           	// mDeleteLogStream->FlushLog(&tmp[0], tmp.size());
             break;
         }
+	// CHKIT - this exceptions is not throwed from our write method !!! 
+	// this will be never called	
         catch(StreamCorruptedException& e)
         {
-            // LOG_ERROR(sLogger, ("DeleteLogStream corrupt", e.ToString()));
+            LOG4CXX_ERROR(logger, "DeleteLogStream corrupt " << e.ToString());
             try
             {
-                // mDeleteLogStream->Close();
             	mDeleteLogFH->Close();
             }
             catch(ExceptionBase& e)
             {
-                // LOG_ERROR(sLogger, ("Failed close file after write fail", e.ToString()));
+                LOG4CXX_ERROR(logger, "Failed close file after write fail " << e.ToString());
             }
-            // mDeleteLogStream.reset(); CHECK
             mDeleteLogFH->Seek(0);
 
             if (++retryCount <= 1)
             {
                 usleep(3000000);
             }
-            // mDeleteLogStream = PanguHelper::OpenLog4Append(mLogFileName);
-		// CHKIT
+        
             mDeleteLogFH = new QFSFileHelper((QFSHelper*)mFileSystemHelper, mLogFileName, O_WRONLY); // WRITE);
 
             if (retryCount > 1)
             {
-                // LOG_ERROR(sLogger, ("DataOutputStream FlushLog fail after retry", e.ToString()));
+                LOG4CXX_ERROR(logger, "DataOutputStream FlushLog fail after retry " << e.ToString());
                 throw;
             }
         }
         catch (ExceptionBase& e)
         {
-            // LOG_ERROR(sLogger, ("DeleteLogStream FlushLog fail", e.ToString()));
+            LOG4CXX_ERROR(logger, "DeleteLogStream FlushLog fail " << e.ToString());
             throw;
         }
     } while (retryCount <= 1);
@@ -326,16 +322,14 @@ bool Chunk::LoadData(bool flag)
     {
         try
         {
-            mLastData = mFileSystemHelper->getSize(mDataFileName.c_str());
+            mLastData = mFileSystemHelper->getSize(mDataFileName);
         }
         catch(ExceptionBase& e)
         {
-            // LOG_ERROR(sLogger, ("error on get data file size", e.ToString()));
+            LOG4CXX_ERROR(logger, "error on get data file size" << e.ToString());
             throw;
         }
-        // mDataOutputStream  = PanguHelper::OpenLog4Append(mDataFileName);
-        // mIndexOutputStream = PanguHelper::OpenLog4Append(mIndexFileName);
-	// CHKIT
+
         mDataOutputFH = new QFSFileHelper((QFSHelper *)mFileSystemHelper, mDataFileName, O_WRONLY);// WRITE);
         mDataOutputFH->Open();
         mIndexOutputFH = new QFSFileHelper((QFSHelper *)mFileSystemHelper, mIndexFileName, O_WRONLY); //WRITE);
@@ -345,25 +339,21 @@ bool Chunk::LoadData(bool flag)
     {
     	mDataInputFH = new QFSFileHelper((QFSHelper *)mFileSystemHelper, mDataFileName, O_RDONLY); // READ);
     	mDataInputFH->Open();
-        // mDataInputStream = PanguHelper::OpenLog4Read(mDataFileName);
     }
     return true;
 }
 
 uint32_t Chunk::GetChunkSize(const std::string& root, ChunkIDType chunk_id)
 {
-	// CHKIT
     std::string dat_file = GetDatFname(root, chunk_id);
     FileSystemHelper *fsh = new QFSHelper();
     fsh->Connect("host", 30000);
-    return fsh->getSize(dat_file.c_str());
+    return fsh->getSize(dat_file);
 }
 
 uint16_t Chunk::GetMaxChunkID(const std::string& root)
 {
     std::string data_root = root + Defaults::DAT_DIR;
-
-    // scan all files from the AppendStore data directory.
     std::vector<std::string> data_files; 
     try
     {
@@ -371,11 +361,11 @@ uint16_t Chunk::GetMaxChunkID(const std::string& root)
 	FileSystemHelper *fsh;
 	fsh = new QFSHelper();
 	fsh->Connect("host", 30000);
-        fsh->ListDir(data_root.c_str(), data_files);
+        fsh->ListDir(data_root, data_files);
     }
     catch(ExceptionBase& e)
     {
-        // LOG_ERROR(sLogger, ("Error", e.ToString()));
+        LOG4CXX_ERROR(logger, "Error " << e.ToString());
         throw;
     }
 
@@ -461,7 +451,7 @@ bool Chunk::Close()
         }
         catch(ExceptionBase& ex)
         {
-            // LOG_ERROR(sLogger, ("Failed to close input data file", ex.ToString()));
+            LOG4CXX_ERROR(logger, "Failed to close input data file" << ex.ToString());
         }
         mDataInputFH->Seek(0); // .reset();
     }
@@ -473,7 +463,7 @@ bool Chunk::Close()
         }
         catch(ExceptionBase& ex)
         {
-            // LOG_ERROR(sLogger, ("Failed to close output data file", ex.ToString()));
+            LOG4CXX_ERROR(logger, "Failed to close output data file " << ex.ToString());
         }
         mDataOutputFH->Seek(0); // .reset();
     }
@@ -485,7 +475,7 @@ bool Chunk::Close()
         }
         catch(ExceptionBase& ex)
         {
-            // LOG_ERROR(sLogger, ("Failed to close output index file", ex.ToString()));
+            LOG4CXX_ERROR(logger, "Failed to close output index file " << ex.ToString());
         }
         mIndexOutputFH->Seek(0); //reset();
     }
@@ -497,7 +487,7 @@ bool Chunk::Close()
         }
         catch(ExceptionBase& ex)
         {
-            // LOG_ERROR(sLogger, ("Failed to close deletelog file", ex.ToString()));
+            LOG4CXX_ERROR(logger, "Failed to close deletelog file" <<  ex.ToString());
         }
         mDeleteLogFH->Seek(0); // .reset();
     }
@@ -536,7 +526,7 @@ bool Chunk::ReadRaw(const OffsetType& offset, std::string& data)
         CompressionCodecPtr sharedptr = mChunkCodec.lock();
         if (sharedptr == NULL)
         {
-            // LOG_ERROR(sLogger, ("Error", "the compression codec has been destructed."));
+            LOG4CXX_ERROR(logger, "Error : the compression codec has been destructed.");
             THROW_EXCEPTION(AppendStoreCompressionException, "decompression error inside ReadRaw()");
         }
 
@@ -545,18 +535,18 @@ bool Chunk::ReadRaw(const OffsetType& offset, std::string& data)
         int retc = sharedptr->decompress(&(crd.mData[0]), crd.mCompressLength, &data[0], uncompressedSize);
         if (uncompressedSize != crd.mOrigLength)
         {
-            // LOG_ERROR(sLogger, ("Error", "error when decompressing due to invalid length"));
+            LOG4CXX_ERROR(logger, ("Error : error when decompressing due to invalid length"));
             THROW_EXCEPTION(AppendStoreCompressionException, "decompression invalid length");
         }
         if (retc < 0)
         {
-            // LOG_ERROR(sLogger, ("Error", "decompression codec error when decompressing inside ReadRaw()"));
+            LOG4CXX_ERROR(logger, ("Error : decompression codec error when decompressing inside ReadRaw()"));
             THROW_EXCEPTION(AppendStoreCompressionException, "decompression codec error");
         }
     }
     catch (ExceptionBase& e)
     {
-        // LOG_ERROR(sLogger, ("Error", e.ToString()));
+        LOG4CXX_ERROR(logger, "Error " << e.ToString());
         throw;
     }
 
@@ -569,7 +559,7 @@ OffsetType Chunk::AppendRaw(const IndexType& index, const uint32_t numentry, con
     CompressionCodecPtr sharedptr = mChunkCodec.lock();
     if (sharedptr == NULL) 
     {
-        // LOG_ERROR(sLogger, ("Error", "the compression codec has been destructed."));
+        LOG4CXX_ERROR(logger, ("Error : the compression codec has been destructed."));
         THROW_EXCEPTION(AppendStoreCompressionException, "compression error inside AppendRaw()");
     }
 
@@ -580,7 +570,7 @@ OffsetType Chunk::AppendRaw(const IndexType& index, const uint32_t numentry, con
     int retc = sharedptr->compress((char*)&data[0], data.size(), &sbuf[0], compressedSize);
     if (retc < 0) 
     {
-        // LOG_ERROR(sLogger, ("Error", "error when compressing data"));
+        LOG4CXX_ERROR(logger, ("Error : error when compressing data"));
         THROW_EXCEPTION(AppendStoreCompressionException, "compression error inside AppendRaw()");
     }
 
@@ -603,14 +593,14 @@ OffsetType Chunk::AppendRaw(const IndexType& index, const uint32_t numentry, con
         }
         catch(StreamCorruptedException& e)
         {
-            // LOG_ERROR(sLogger, ("DataOutputStream corrupt", e.ToString()));
+            LOG4CXX_ERROR(logger, "DataOutputStream corrupt : " << e.ToString());
             try
             {
                 mDataOutputFH->Close();
             }
             catch(ExceptionBase& e)
             {
-                // LOG_ERROR(sLogger, ("Failed close file after write fail", e.ToString()));
+                LOG4CXX_ERROR(logger, "Failed close file after write fail : " << e.ToString());
             }
             mDataOutputFH->Seek(0); // .reset();
 
@@ -626,13 +616,13 @@ OffsetType Chunk::AppendRaw(const IndexType& index, const uint32_t numentry, con
             
             if (retryCount > 1)
             {
-                // LOG_ERROR(sLogger, ("DataOutputStream FlushLog fail after retry", e.ToString()));
+                LOG4CXX_ERROR(logger, "DataOutputStream FlushLog fail after retry : " << e.ToString());
                 throw;
             }
         }
         catch(ExceptionBase& e)
         {
-            // LOG_ERROR(sLogger, ("DataOutputStream FlushLog fail", e.ToString()));
+            LOG4CXX_ERROR(logger, "DataOutputStream FlushLog fail : " << e.ToString());
             throw;
         }
     } while (retryCount <= 1);

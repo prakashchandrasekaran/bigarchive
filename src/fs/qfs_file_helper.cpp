@@ -1,5 +1,6 @@
 #include "qfs_file_helper.h"
 
+
 	QFSFileHelper::QFSFileHelper(QFSHelper *qfshelper, string fname, int mode) {
 		LOG4CXX_INFO(logger, "File helper for file created : " << fname );
 		this->qfshelper = qfshelper;
@@ -13,13 +14,16 @@
 		fd = qfshelper->kfsClient->Create(filename.c_str());
 		if (fd < 0) { 
 			LOG4CXX_ERROR(logger, "File Creation failed : " << filename);
-			// THROW_EXCEPTION
+			THROW_EXCEPTION(FileCreationException, "Failed while creating file : " + filename);
 		}
 	}
 
 	void QFSFileHelper::Open() {
 		fd = qfshelper->kfsClient->Open(filename.c_str(), mode);
-		if(fd < 0) { }
+		if(fd < 0) { 
+			LOG4CXX_ERROR(logger, "Failed while opening file : " << filename << ", ERROR :" << KFS::ErrorCodeToStr(fd));
+			THROW_EXCEPTION(FileOpenException, "Failed while opening file : " + filename + " ERROR : " + KFS::ErrorCodeToStr(fd));
+		}
 	}
 
 	void QFSFileHelper::Close() {
@@ -29,17 +33,28 @@
 		qfshelper->kfsClient->Close(fd);
 	}
 
-	void QFSFileHelper::Read(char *buffer, int length) {
+	int QFSFileHelper::Read(char *buffer, int length) {
 		int bytes_read = qfshelper->kfsClient->Read(fd, buffer, length);
 		if(bytes_read != length) {
 			if(bytes_read < 0) {
-				LOG4CXX_ERROR(logger, "Failure while reading file " << filename << " " << KFS::ErrorCodeToStr(bytes_read));
+				LOG4CXX_ERROR(logger, "Failure while reading file " << filename << " ERROR : " << KFS::ErrorCodeToStr(bytes_read));
+				THROW_EXCEPTION(AppendStoreReadException, "Failed while reading file " + filename + " ERROR : " + KFS::ErrorCodeToStr(bytes_read));
+			}
+			else {
+				LOG4CXX_ERROR(logger, "Less number of bytes read from file than specified")
 			}
 		}
+		return bytes_read;	
 	}
 
-	void QFSFileHelper::Write(char *buffer, int length) {
-		qfshelper->kfsClient->Write(fd, buffer, length);
+	int QFSFileHelper::Write(char *buffer, int length) {
+		int bytes_wrote = qfshelper->kfsClient->Write(fd, buffer, length);
+		if( bytes_wrote != length) {
+			string bytes_wrote_str = "" + bytes_wrote;
+			string length_str = "" + length;
+			LOG4CXX_ERROR(logger, "Was able to write only " << bytes_wrote << ", instead of " << length);
+			THROW_EXCEPTION(AppendStoreWriteException,  "Was able to write only " + bytes_wrote_str + ", instead of " + length_str);
+		}
 	}
 
 	void QFSFileHelper::Seek(int offset) {

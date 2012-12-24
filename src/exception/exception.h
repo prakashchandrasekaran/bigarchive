@@ -117,6 +117,24 @@ public:
     {}
 };
 
+
+class FileCreationException : public AppendStoreExceptionBase
+{
+public:
+    FileCreationException(const std::string& message = "") throw ()
+        : AppendStoreExceptionBase(message)
+    {}
+};
+
+class FileOpenException : public AppendStoreExceptionBase
+{
+public:
+    FileOpenException(const std::string& message = "") throw ()
+        : AppendStoreExceptionBase(message)
+    {}
+};
+
+
 class AppendStoreInvalidIndexException : public AppendStoreExceptionBase
 {
 public:
